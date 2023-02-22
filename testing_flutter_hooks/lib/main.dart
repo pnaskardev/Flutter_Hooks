@@ -5,22 +5,23 @@ void main() {
   runApp(const MainApp());
 }
 
-Stream<String> getTime()
-{
-  return Stream.periodic
-  (
-    const Duration(seconds: 1),
-    (_)=>DateTime.now().toIso8601String()
-  );
-}
-
 class MainApp extends HookWidget 
 {
   const MainApp({super.key});
+
   @override
   Widget build(BuildContext context) 
   {
-    final dateTime=useStream(getTime());
+    final controller=useTextEditingController();
+    final text=useState('');
+    useEffect(()
+    {
+      controller.addListener(() 
+      {
+        text.value=controller.text;
+      });
+      return null;
+    },[controller]);
     return  MaterialApp
     (
       home: Scaffold
@@ -30,10 +31,17 @@ class MainApp extends HookWidget
           centerTitle: true,
           title: const Text('HomePage'),
         ),
-        body:  Center
+        body:  Column
         (
-          child: Text(dateTime.data ??'Homepage'),
-        ),
+          children: 
+          [
+            TextFormField
+            (
+              controller: controller,
+            ),
+            Text('You typed ${text.value}')
+          ],
+        )
       ),
     );
   }
